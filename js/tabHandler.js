@@ -25,7 +25,7 @@ class TabHandler {
         const refreshBtn = document.getElementById('refreshBtn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', () => {
-                this.refreshCurrentTab();
+                this.triggerManualCrawling();
             });
         }
     }
@@ -151,6 +151,88 @@ class TabHandler {
         });
         
         return summary;
+    }
+
+    async triggerManualCrawling() {
+        const refreshBtn = document.getElementById('refreshBtn');
+        if (!refreshBtn) return;
+
+        // 버튼 비활성화 및 로딩 상태 표시
+        const originalContent = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+        refreshBtn.disabled = true;
+
+        try {
+            // GitHub Actions 워크플로우 수동 실행
+            const response = await fetch('https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/actions/workflows/crawl-news.yml/dispatches', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'token YOUR_GITHUB_TOKEN',
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ref: 'main'
+                })
+            });
+
+            if (response.ok) {
+                // 성공 메시지 표시
+                this.showNotification('크롤링이 시작되었습니다. 몇 분 후 새로고침해주세요.', 'success');
+                
+                // 5초 후 자동 새로고침
+                setTimeout(() => {
+                    this.refreshCurrentTab();
+                }, 5000);
+            } else {
+                throw new Error('크롤링 실행에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Manual crawling error:', error);
+            
+            // 로컬 크롤링 시도 (개발 환경용)
+            this.showNotification('로컬 크롤링을 실행합니다...', 'info');
+            
+            try {
+                // 로컬 크롤링 API 호출 (만약 있다면)
+                const localResponse = await fetch('/api/crawl', {
+                    method: 'POST'
+                });
+                
+                if (localResponse.ok) {
+                    this.showNotification('로컬 크롤링이 완료되었습니다.', 'success');
+                    this.refreshCurrentTab();
+                } else {
+                    throw new Error('로컬 크롤링도 실패했습니다.');
+                }
+            } catch (localError) {
+                this.showNotification('크롤링을 실행할 수 없습니다. 잠시 후 다시 시도해주세요.', 'error');
+            }
+        } finally {
+            // 버튼 상태 복원
+            refreshBtn.innerHTML = originalContent;
+            refreshBtn.disabled = false;
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        // 간단한 알림 표시
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // 5초 후 자동 제거
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
     }
 
     formatSummaryText(text) {

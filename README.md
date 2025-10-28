@@ -12,7 +12,7 @@
 - **AI 기반 요약**: 키워드 분석을 통한 스마트한 요약 생성
 - **주요 관심사**: 자동 추출된 키워드 (주식시장, 부동산, 금리정책 등)
 - **8개 뉴스**: 오늘과 어제의 최신 경제 뉴스
-- **실시간 업데이트**: 매일 아침 6시 자동 갱신
+- **실시간 업데이트**: 매시간 자동 갱신
 
 ### 📰 **뉴스 탭 - 최신 뉴스 목록**
 - **다양한 소스**: 한국경제신문 7개 섹션 (경제, 주식, 금융, 부동산, 산업, 글로벌, 정치)
@@ -64,7 +64,40 @@ git clone <repository-url>
 cd economic-news-service
 ```
 
-### 2. GitHub Pages 배포
+### 2. 로컬 개발 환경 설정
+```bash
+# 가상환경 생성 (권장)
+python -m venv venv
+
+# 가상환경 활성화
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+
+# 의존성 설치
+pip install -r scripts/requirements.txt
+
+# 웹 서버 실행
+python -m http.server 8000
+# 브라우저에서 http://localhost:8000 접속
+```
+
+### 3. 수동 크롤링 API 서버 (선택사항)
+```bash
+# 로컬 크롤링 API 서버 실행
+python start_api.py
+
+# 또는 직접 실행
+python api/crawl.py
+```
+
+**API 서버 기능:**
+- `POST http://localhost:5000/api/crawl` - 수동 크롤링 실행
+- `GET http://localhost:5000/api/status` - 서버 상태 확인
+- `GET http://localhost:5000/api/health` - 헬스 체크
+
+### 4. GitHub Pages 배포
 1. **GitHub 저장소에 코드 푸시**
    ```bash
    git add .

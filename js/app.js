@@ -98,6 +98,11 @@ class App {
             // 로컬 백업
             window.newsLoader.backupToLocal(normalizedData);
 
+            // 홈 탭 데이터 자동 로드
+            if (window.tabHandler) {
+                window.tabHandler.loadHomeData();
+            }
+
             console.log('Initial data loaded successfully');
             return normalizedData;
 
@@ -109,6 +114,10 @@ class App {
                 const backupData = window.newsLoader.restoreFromLocal();
                 if (backupData) {
                     console.log('Using backup data');
+                    // 백업 데이터로도 홈 탭 로드 시도
+                    if (window.tabHandler) {
+                        window.tabHandler.loadHomeData();
+                    }
                     return backupData;
                 }
             }

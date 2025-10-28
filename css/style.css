@@ -50,6 +50,16 @@ body {
     transform: rotate(180deg);
 }
 
+/* 스핀 애니메이션 */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 /* Main Content */
 .main-content {
     padding: 2rem 0 80px 0; /* Top padding added, space for bottom nav */
