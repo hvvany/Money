@@ -101,11 +101,11 @@ class TabHandler {
                 }
             }
             
+            // 마크다운 형식을 HTML로 변환
+            const formattedSummary = this.formatSummaryText(summary);
             summaryContent.innerHTML = `
                 <div class="summary-text">
-                    ${summary.split('\n').map(sentence => 
-                        `<p class="summary-sentence">${sentence.trim()}</p>`
-                    ).join('')}
+                    ${formattedSummary}
                 </div>
             `;
         } catch (error) {
@@ -151,6 +151,16 @@ class TabHandler {
         });
         
         return summary;
+    }
+
+    formatSummaryText(text) {
+        // 마크다운 형식을 HTML로 변환
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // **텍스트** -> <strong>텍스트</strong>
+            .replace(/\n\n/g, '</p><p class="summary-sentence">') // 이중 줄바꿈을 문단 구분으로
+            .replace(/\n/g, '<br>') // 단일 줄바꿈을 <br>로
+            .replace(/^/, '<p class="summary-sentence">') // 시작에 <p> 태그 추가
+            .replace(/$/, '</p>'); // 끝에 </p> 태그 추가
     }
 
     async loadNewsData() {
