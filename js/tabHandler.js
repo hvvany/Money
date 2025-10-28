@@ -91,22 +91,23 @@ class TabHandler {
             
             const data = await response.json();
             
-            if (data.summary) {
-                summaryContent.innerHTML = `
-                    <div class="summary-text">
-                        ${data.summary.split('\n').map(sentence => 
-                            `<p class="summary-sentence">${sentence.trim()}</p>`
-                        ).join('')}
-                    </div>
-                `;
-            } else {
-                summaryContent.innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i>
-                        오늘의 경제 이슈 요약이 아직 준비되지 않았습니다.
-                    </div>
-                `;
+            // 요약이 있으면 표시, 없으면 뉴스 제목들로 요약 생성
+            let summary = data.summary;
+            if (!summary || summary.trim() === '' || summary.includes('오류가 발생했습니다')) {
+                if (data.news && data.news.length > 0) {
+                    summary = this.generateSummaryFromNews(data.news);
+                } else {
+                    summary = "오늘의 경제 이슈를 불러오는 중입니다.";
+                }
             }
+            
+            summaryContent.innerHTML = `
+                <div class="summary-text">
+                    ${summary.split('\n').map(sentence => 
+                        `<p class="summary-sentence">${sentence.trim()}</p>`
+                    ).join('')}
+                </div>
+            `;
         } catch (error) {
             console.error('Error loading home data:', error);
             summaryContent.innerHTML = `
@@ -116,6 +117,40 @@ class TabHandler {
                 </div>
             `;
         }
+    }
+
+    generateSummaryFromNews(newsList) {
+        if (!newsList || newsList.length === 0) {
+            return "오늘의 경제 이슈를 불러오는 중입니다.";
+        }
+
+        const titles = newsList.slice(0, 5).map(news => news.title);
+        
+        // 주요 키워드 추출
+        const keywords = [];
+        titles.forEach(title => {
+            if (title.includes('부동산') || title.includes('아파트')) keywords.push('부동산');
+            if (title.includes('주가') || title.includes('증시') || title.includes('코스피')) keywords.push('주식시장');
+            if (title.includes('금리') || title.includes('중앙은행')) keywords.push('금리정책');
+            if (title.includes('경기') || title.includes('성장')) keywords.push('경기동향');
+            if (title.includes('APEC') || title.includes('정상회의')) keywords.push('국제정치');
+        });
+
+        const uniqueKeywords = [...new Set(keywords)];
+        
+        let summary = "📈 **오늘의 주요 경제 이슈**\n\n";
+        
+        if (uniqueKeywords.length > 0) {
+            summary += `주요 관심사: ${uniqueKeywords.join(', ')}\n\n`;
+        }
+        
+        summary += "**주요 뉴스:**\n";
+        titles.forEach((title, index) => {
+            const shortTitle = title.length > 60 ? title.substring(0, 60) + "..." : title;
+            summary += `${index + 1}. ${shortTitle}\n`;
+        });
+        
+        return summary;
     }
 
     async loadNewsData() {
