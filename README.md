@@ -58,6 +58,8 @@
 
 ## 🛠️ 설치 및 배포
 
+> **📖 상세 설정 가이드**: [SETUP_GUIDE.md](SETUP_GUIDE.md) 참고
+
 ### 1. 저장소 클론
 ```bash
 git clone <repository-url>
