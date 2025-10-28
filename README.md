@@ -71,20 +71,36 @@ cd economic-news-service
 ```
 
 ### 2. GitHub Pages 배포
-1. GitHub 저장소에 코드 푸시
-2. Settings > Pages에서 GitHub Pages 활성화
-3. Source를 "Deploy from a branch" 선택
-4. Branch를 "main" 선택
+1. **GitHub 저장소에 코드 푸시**
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
 
-### 3. OpenAI API 키 설정
-1. GitHub 저장소 Settings > Secrets and variables > Actions
+2. **GitHub Pages 활성화**
+   - GitHub 저장소 → Settings → Pages
+   - Source: "Deploy from a branch" 선택
+   - Branch: "main" 선택
+   - Folder: "/ (root)" 선택
+   - Save 클릭
+
+3. **배포 완료 확인**
+   - `https://[username].github.io/[repository-name]`에서 접속 가능
+   - 배포 완료까지 5-10분 소요
+
+### 3. OpenAI API 키 설정 (선택사항)
+> **참고**: 정적 데이터 기반으로도 작동하지만, 뉴스 요약 기능을 위해 필요합니다.
+
+1. GitHub 저장소 → Settings → Secrets and variables → Actions
 2. "New repository secret" 클릭
 3. Name: `OPENAI_API_KEY`
 4. Value: OpenAI API 키 입력
 
-### 4. 자동 크롤링 활성화
+### 4. 자동 크롤링 활성화 (선택사항)
 - GitHub Actions가 자동으로 매일 06:00 KST에 실행됩니다
-- 수동 실행: Actions 탭 > "Daily News Crawler" > "Run workflow"
+- 수동 실행: Actions 탭 → "Daily News Crawler" → "Run workflow"
+- **주의**: API 키가 설정되어 있어야 정상 작동합니다
 
 ## 📱 사용법
 

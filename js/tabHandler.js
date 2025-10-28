@@ -188,22 +188,16 @@ class TabHandler {
                 </div>
             `;
 
-            // Initialize RAG system
-            if (!window.ragHandler.isInitialized) {
-                const initialized = await window.ragHandler.initialize();
-                if (!initialized) {
-                    throw new Error('RAG 시스템을 초기화할 수 없습니다.');
-                }
-            }
+            // RAG system is already initialized (static data)
 
             // Load categories and knowledge
-            const categoriesData = await window.ragHandler.getCategories();
+            const categoriesData = window.ragHandler.getCategories();
             
             if (categoriesData.categories && categoriesData.categories.length > 0) {
                 let html = '';
                 
                 for (const category of categoriesData.categories) {
-                    const knowledgeData = await window.ragHandler.getKnowledgeByCategory(category);
+                    const knowledgeData = window.ragHandler.getKnowledgeByCategory(category);
                     
                     if (knowledgeData.knowledge && knowledgeData.knowledge.length > 0) {
                         html += `
